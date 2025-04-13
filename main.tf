@@ -6,7 +6,7 @@ resource "google_compute_address" "bastion_public_ip" {
 
 resource "google_compute_instance" "bastion" {
   name         = "bastion-host"
-  machine_type = "e2-micro"
+  machine_type = var.machine_type
   zone         = var.zone
   boot_disk {
     initialize_params {
