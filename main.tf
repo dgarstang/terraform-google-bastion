@@ -44,9 +44,12 @@ resource "google_compute_instance" "bastion" {
     PrivateKey = $PRIVATE_KEY
     SaveConfig = false
 
+    PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
     [Peer]
     PublicKey = VDVcbDHbxkVjz2j09VW6wLiYc5Sdt3r2ZfYmSSkvJVM=
-    AllowedIPs = 10.0.0.2/32
+    AllowedIPs = 10.0.0.2/32, 10.138.0.0/20
     EOF
 
     sysctl -w net.ipv4.ip_forward=1
