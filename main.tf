@@ -34,6 +34,7 @@ resource "google_compute_instance" "bastion" {
     wg genkey | tee /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
 
     PRIVATE_KEY=$(cat /etc/wireguard/privatekey)
+    PUBLIC_KEY=$(wg pubkey < /etc/wireguard/privatekey)
 
     systemctl stop wg-quick@wg0
 
