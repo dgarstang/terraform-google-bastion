@@ -45,7 +45,7 @@ resource "google_compute_instance" "bastion" {
     SaveConfig = false
 
     [Peer]
-    PublicKey = rkysLZbnTa6mJOzeabZuF8fL8uiKWpkXUXx/tgdSEWM=
+    PublicKey = VDVcbDHbxkVjz2j09VW6wLiYc5Sdt3r2ZfYmSSkvJVM=
     AllowedIPs = 10.0.0.2/32
     EOF
 
