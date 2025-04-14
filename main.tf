@@ -24,4 +24,27 @@ resource "google_compute_instance" "bastion" {
   metadata = {
     ssh-keys = var.ssh_public_key
   }
+
+  metadata_startup_script = <<-EOT
+    #!/bin/bash
+    apt-get update
+    apt-get install -y wireguard
+
+    umask 077
+    wg genkey | tee /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
+
+    PRIVATE_KEY=$(cat /etc/wireguard/privatekey)
+
+    cat <<EOF > /etc/wireguard/wg0.conf
+    [Interface]
+    Address = 10.0.0.1/24
+    ListenPort = 51820
+    PrivateKey = $PRIVATE_KEY
+    SaveConfig = true
+    EOF
+
+    systemctl enable wg-quick@wg0
+    systemctl start wg-quick@wg0
+  EOT
+
 }

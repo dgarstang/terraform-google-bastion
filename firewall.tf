@@ -24,3 +24,16 @@ resource "google_compute_firewall" "delete_default_ingress" {
   source_ranges = ["202.92.122.131/32"]
     target_tags   = ["allow-ssh"]
 }
+
+resource "google_compute_firewall" "wireguard" {
+  name    = "allow-wireguard"
+  network = "custom"
+
+  allow {
+    protocol = "udp"
+    ports    = ["51820"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["wireguard"]
+}
