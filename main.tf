@@ -20,7 +20,7 @@ resource "google_compute_instance" "bastion" {
       network_tier = "STANDARD"
     }
   }
-  tags = ["allow-ssh"]
+  tags = ["allow-ssh", "wireguard"]
   metadata = {
     ssh-keys = var.ssh_public_key
   }
