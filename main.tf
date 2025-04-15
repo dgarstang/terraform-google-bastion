@@ -47,8 +47,8 @@ resource "google_compute_instance" "bastion" {
         PrivateKey = ${wireguard_asymmetric_key.key[0].private_key}
         SaveConfig = false
 
-        PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-        PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+        PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE ; iptables -t nat -A POSTROUTING -o ens4 -s 10.0.0.0/24 -j MASQUERADE
+        PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE ;  iptables -t nat -D POSTROUTING -o ens4 -s 10.0.0.0/24 -j MASQUERADE
 
         [Peer]
         PublicKey = ${var.vpn_client_public_key}
