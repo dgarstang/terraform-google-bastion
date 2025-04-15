@@ -22,7 +22,7 @@ resource "google_compute_firewall" "delete_default_ingress" {
     ports    = ["22"]
   }
   source_ranges = ["202.92.122.131/32"]
-    target_tags   = ["allow-ssh"]
+  target_tags   = ["allow-ssh"]
 }
 
 resource "google_compute_firewall" "wireguard" {

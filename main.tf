@@ -31,10 +31,9 @@ resource "google_compute_instance" "bastion" {
     apt-get install -y wireguard
 
     umask 077
-    wg genkey | tee /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
-
-    PRIVATE_KEY=$(cat /etc/wireguard/privatekey)
-    PUBLIC_KEY=$(wg pubkey < /etc/wireguard/privatekey)
+    echo "${wireguard_asymmetric_key.key.private_key}" > /etc/wireguard/privatekey
+    echo "${wireguard_asymmetric_key.key.public_key}" > /etc/wireguard/publickey
+    chmod 600 /etc/wireguard/privatekey /etc/wireguard/publickey
 
     systemctl stop wg-quick@wg0
 
@@ -42,14 +41,14 @@ resource "google_compute_instance" "bastion" {
     [Interface]
     Address = 10.0.0.1/24
     ListenPort = 51820
-    PrivateKey = $PRIVATE_KEY
+    PrivateKey = ${wireguard_asymmetric_key.key.private_key}
     SaveConfig = false
 
     PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
     PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
     [Peer]
-    PublicKey = VDVcbDHbxkVjz2j09VW6wLiYc5Sdt3r2ZfYmSSkvJVM=
+    PublicKey = ${var.vpn_client_public_key}
     AllowedIPs = 10.0.0.2/32, 10.138.0.0/20
     EOF
 

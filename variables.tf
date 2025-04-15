@@ -1,7 +1,7 @@
 variable "machine_type" {
   description = "Machine type"
-  type = string
-  default = "e2-micro"
+  type        = string
+  default     = "e2-micro"
 }
 
 variable "region" {
@@ -27,4 +27,8 @@ variable "ssh_public_key" {
 variable "network_name" {
   description = "The name of the network where the firewall will be created"
   type        = string
+}
+
+variable "vpn_client_public_key" {
+  type = string
 }
