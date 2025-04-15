@@ -52,7 +52,7 @@ resource "google_compute_instance" "bastion" {
 
         [Peer]
         PublicKey = ${var.vpn_client_public_key}
-        AllowedIPs = 10.0.0.2/32, 10.138.0.0/20
+        AllowedIPs = 10.0.0.2/32
         EOF
 
         sysctl -w net.ipv4.ip_forward=1
