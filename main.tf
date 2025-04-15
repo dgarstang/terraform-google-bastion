@@ -8,6 +8,7 @@ resource "google_compute_instance" "bastion" {
   name         = "bastion-host"
   machine_type = var.machine_type
   zone         = var.zone
+  can_ip_forward = true
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"
