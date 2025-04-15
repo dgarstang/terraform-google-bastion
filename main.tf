@@ -21,42 +21,46 @@ resource "google_compute_instance" "bastion" {
     }
   }
   tags = ["allow-ssh", "wireguard"]
-  metadata = {
-    ssh-keys = var.ssh_public_key
-  }
 
-  metadata_startup_script = <<-EOT
-    #!/bin/bash
-    apt-get update
-    apt-get install -y wireguard
+  metadata = merge(
+    {
+      ssh-keys = var.ssh_public_key
+    },
+    var.enable_vpn ? {
+      startup-script = <<-EOT
+        #!/bin/bash
+        apt-get update
+        apt-get install -y wireguard
 
-    umask 077
-    echo "${wireguard_asymmetric_key.key.private_key}" > /etc/wireguard/privatekey
-    echo "${wireguard_asymmetric_key.key.public_key}" > /etc/wireguard/publickey
-    chmod 600 /etc/wireguard/privatekey /etc/wireguard/publickey
+        umask 077
+        echo "${wireguard_asymmetric_key.key[0].private_key}" > /etc/wireguard/privatekey
+        echo "${wireguard_asymmetric_key.key[0].public_key}" > /etc/wireguard/publickey
+        chmod 600 /etc/wireguard/privatekey /etc/wireguard/publickey
 
-    systemctl stop wg-quick@wg0
+        systemctl stop wg-quick@wg0
 
-    cat <<EOF > /etc/wireguard/wg0.conf
-    [Interface]
-    Address = 10.0.0.1/24
-    ListenPort = 51820
-    PrivateKey = ${wireguard_asymmetric_key.key.private_key}
-    SaveConfig = false
+        cat <<EOF > /etc/wireguard/wg0.conf
+        [Interface]
+        Address = 10.0.0.1/24
+        ListenPort = 51820
+        PrivateKey = ${wireguard_asymmetric_key.key[0].private_key}
+        SaveConfig = false
 
-    PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-    PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+        PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+        PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
-    [Peer]
-    PublicKey = ${var.vpn_client_public_key}
-    AllowedIPs = 10.0.0.2/32, 10.138.0.0/20
-    EOF
+        [Peer]
+        PublicKey = ${var.vpn_client_public_key}
+        AllowedIPs = 10.0.0.2/32, 10.138.0.0/20
+        EOF
 
-    sysctl -w net.ipv4.ip_forward=1
-    echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+        sysctl -w net.ipv4.ip_forward=1
+        echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
-    systemctl enable wg-quick@wg0
-    systemctl start wg-quick@wg0
-  EOT
-
+        systemctl enable wg-quick@wg0
+        systemctl start wg-quick@wg0
+      EOT
+    } : {}
+  )
 }
+

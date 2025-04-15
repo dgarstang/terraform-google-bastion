@@ -32,3 +32,8 @@ variable "network_name" {
 variable "vpn_client_public_key" {
   type = string
 }
+
+variable "enable_vpn" {
+  type    = bool
+  default = true
+}
