@@ -36,6 +36,7 @@ resource "google_compute_firewall" "node_to_node" {
   network       = var.network_name
   direction     = "INGRESS"
   priority      = 1000
+  source_ranges = ["10.0.0.0/8"]
   allow {
     protocol = "all"
   }
