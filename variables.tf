@@ -45,7 +45,7 @@ variable "vpn_interface_cidr" {
 
 variable "vpn_client_allowed_ips" {
     type = string
-  default = "10.0.0.2/32"
+  default = "10.0.0.2/32, 172.16.0.0/28"
 }
 
 variable "vpn_interface_listen_port" {
