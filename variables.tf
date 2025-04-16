@@ -37,3 +37,18 @@ variable "enable_vpn" {
   type    = bool
   default = true
 }
+
+variable "vpn_interface_cidr" {
+  type = string
+  default = "10.0.0.1/24"
+}
+
+variable "vpn_client_allowed_ips" {
+    type = string
+  default = "10.0.0.2/32"
+}
+
+variable "vpn_interface_listen_port" {
+  type = number
+  default = 51820
+}

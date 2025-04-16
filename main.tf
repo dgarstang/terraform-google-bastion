@@ -42,8 +42,8 @@ resource "google_compute_instance" "bastion" {
 
         cat <<EOF > /etc/wireguard/wg0.conf
         [Interface]
-        Address = 10.0.0.1/24
-        ListenPort = 51820
+        Address = ${var.vpn_interface_cidr}
+        ListenPort = ${var.vpn_interface_listen_port}
         PrivateKey = ${wireguard_asymmetric_key.key[0].private_key}
         SaveConfig = false
 
@@ -52,7 +52,7 @@ resource "google_compute_instance" "bastion" {
 
         [Peer]
         PublicKey = ${var.vpn_client_public_key}
-        AllowedIPs = 10.0.0.2/32
+        AllowedIPs = ${var.vpn_client_allowed_ips}
         EOF
 
         sysctl -w net.ipv4.ip_forward=1
