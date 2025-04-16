@@ -2,7 +2,11 @@ resource "google_compute_firewall" "control_plane_to_nodes" {
   name          = "allow-control-plane-to-nodes"
   network       = var.network_name
   direction     = "INGRESS"
-  source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
+  source_ranges = [
+    "35.191.0.0/16", 
+    "130.211.0.0/22", 
+    "172.16.0.0/28"  # Adding control plane's private range
+  ]
   priority      = 1000
   allow {
     protocol = "tcp"
@@ -22,7 +26,7 @@ resource "google_compute_firewall" "nodes_to_control_plane" {
   name               = "allow-nodes-to-control-plane"
   network            = var.network_name
   direction          = "EGRESS"
-  destination_ranges = ["172.16.0.0/12"] # Replace with actual control plane private range
+  destination_ranges = ["172.16.0.0/28"]  # Adjusting to control plane's actual IP range
   priority           = 1000
   allow {
     protocol = "tcp"
